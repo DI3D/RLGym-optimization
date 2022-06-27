@@ -21,7 +21,6 @@ class DefaultState(StateSetter):
     def reset(self, state_wrapper: StateWrapper):
         """
         Modifies state_wrapper values to emulate a randomly selected default kickoff.
-
         :param state_wrapper: StateWrapper object to be modified with desired state values.
         """
         # possible kickoff indices are shuffled
@@ -31,7 +30,7 @@ class DefaultState(StateSetter):
         blue_count = 0
         orange_count = 0
         for car in state_wrapper.cars:
-            pos = [0,0,0]
+            pos = [0, 0, 0]
             yaw = 0
             # team_num = 0 = blue team
             if car.team_num == 0:

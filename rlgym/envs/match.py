@@ -127,6 +127,7 @@ class Match(Environment):
         self._prev_actions[:len(actions)] = actions[:]
 
         acts = []
+        # print(self._spectator_ids)
         for i in range(len(actions)):
             acts.append(float(self._spectator_ids[i]))
             for act in actions[i]:

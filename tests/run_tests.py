@@ -2,10 +2,11 @@ import rlgym
 import traceback
 from tests.utils.state_obs import StateObs
 from tests.utils.setter_wrapper import SetterWrapper
-from tests.cases.boost_pad_test import BoostPadTest
+# from tests.cases.boost_pad_test import BoostPadTest
+from tests.cases.fps_test import FpsTest
 
 test_suite = [
-    BoostPadTest(),
+    FpsTest(),
 ]
 
 # Split tests by config
@@ -22,7 +23,8 @@ total_passed = 0
 for config, tests in tests_by_config.items():
     print('Starting RLGym with config:', dict(config))
     # Load env with required config
-    env = rlgym.make(obs_builder=StateObs(), state_setter=setter_wrapper, use_injector=True, **dict(config))
+    env = rlgym.make(obs_builder=StateObs(), state_setter=setter_wrapper, use_injector=True, spawn_opponents=True,
+                     game_speed=100000, **dict(config))
 
     print('--------- Test Set ----------')
     passed = 0

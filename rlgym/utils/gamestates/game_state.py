@@ -3,7 +3,7 @@
 """
 
 import numpy as np
-from typing import List, Optional
+from typing import Optional, List
 from rlgym.utils.gamestates import PlayerData, PhysicsObject
 
 
@@ -50,7 +50,7 @@ class GameState(object):
         # The state will contain the ball, the mirrored ball, every player, every player mirrored, the score for both teams, and the number of ticks since the last packet was sent.
         num_player_packets = int((len(state_vals) - num_ball_packets * b_len - start - pads_len) / p_len)
 
-        ticks = int(state_vals[0])
+        # ticks = int(state_vals[0])
 
         self.blue_score = int(state_vals[1])
         self.orange_score = int(state_vals[2])
@@ -74,13 +74,16 @@ class GameState(object):
 
             if player.ball_touched:
                 self.last_touch = player.car_id
-                
+
         self.players = sorted(self.players, key=lambda p: p.car_id) #YOU'RE WELCOME RANGLER, THIS WAS MY INNOVATION.
 
-    def _decode_player(self, full_player_data):
+    @staticmethod
+    def _decode_player(full_player_data):
         player_data = PlayerData()
         c_len = GameState.PLAYER_CAR_STATE_LENGTH
+        # c_len = 13
         t_len = GameState.PLAYER_TERTIARY_INFO_LENGTH
+        # t_len = 11
 
         start = 2
 

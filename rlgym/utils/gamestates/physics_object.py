@@ -87,15 +87,15 @@ class PhysicsObject(object):
         if self.position is not None:
             for arg in self.position:
                 repr.append(arg)
-                
+
         if self.quaternion is not None:
             for arg in self.quaternion:
                 repr.append(arg)
-                
+
         if self.linear_velocity is not None:
             for arg in self.linear_velocity:
                 repr.append(arg)
-                
+
         if self.angular_velocity is not None:
             for arg in self.angular_velocity:
                 repr.append(arg)

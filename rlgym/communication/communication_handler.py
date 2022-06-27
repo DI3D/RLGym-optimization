@@ -3,8 +3,9 @@ from rlgym.communication import communication_exception_handler
 
 import win32file
 import win32pipe
-import struct
+# import struct
 from multiprocessing.pool import ThreadPool
+import array
 
 
 class CommunicationHandler(object):
@@ -20,7 +21,7 @@ class CommunicationHandler(object):
         self.message = Message()
 
     def receive_message(self, header=None, num_attempts=100):
-        #TODO: deal with discarded messages while waiting for a specific header
+        # TODO: deal with discarded messages while waiting for a specific header
         if not self.is_connected():
             print("RLGYM ATTEMPTED TO RECEIVE MESSAGE WITH NO CONNECTION")
             return communication_exception_handler.BROKEN_PIPE_ERROR
@@ -29,16 +30,20 @@ class CommunicationHandler(object):
         exception_code = None
         try:
             for i in range(num_attempts):
-                #print("Waiting for header",header)
+                # print("Waiting for header",header)
+                a = array.array("f")
                 code, msg_bytes = win32file.ReadFile(self._pipe, CommunicationHandler.RLGYM_DEFAULT_PIPE_SIZE)
-                msg_floats = list(struct.unpack('%sf' % (len(msg_bytes)//4), msg_bytes))
+                # a = array.array("f")
+                a.frombytes(msg_bytes)
+                msg_floats = a.tolist()
+                # msg_floats = list(struct.unpack('%sf' % (len(msg_bytes)//4), msg_bytes))
                 deserialized_header = Message.deserialize_header(msg_floats)
-                #print("GOT HEADER",deserialized_header,"\nWANTED HEADER",header)
+                # print("GOT HEADER",deserialized_header,"\nWANTED HEADER",header)
 
-                #Only deserialize valid messages.
+                # Only deserialize valid messages.
                 if header is None or header == deserialized_header:
                     received_message.deserialize(msg_floats)
-                    #print("RETURNING MESSAGE BODY:",received_message.body)
+                    # print("RETURNING MESSAGE BODY:",received_message.body)
 
                     # Peek the next message in the pipe to see if we've reached the end of new messages.
                     data = win32pipe.PeekNamedPipe(self._pipe, CommunicationHandler.RLGYM_DEFAULT_PIPE_SIZE)
@@ -50,7 +55,7 @@ class CommunicationHandler(object):
             print("Receive message failed")
             exception_code = communication_exception_handler.handle_exception(e)
 
-        #TODO: make sure users of this object deal with the null message response
+        # TODO: make sure users of this object deal with the null message response
         return received_message, exception_code
 
     def send_message(self, message=None, header=None, body=None):
@@ -70,10 +75,13 @@ class CommunicationHandler(object):
             message.body = body
 
         serialized = message.serialize()
-        #print("TRANSMITTING",serialized)
+        # print("TRANSMITTING",serialized)
         exception_code = None
+        a = array.array("f")
         try:
-            encoded = struct.pack('%sf' % len(serialized), *serialized)
+            a.fromlist(serialized)
+            encoded = a.tobytes()
+            # encoded = struct.pack('%sf' % len(serialized), *serialized)
             win32file.WriteFile(self._pipe, encoded)
 
         except BaseException as e:
@@ -94,7 +102,7 @@ class CommunicationHandler(object):
         pool = ThreadPool(processes=1)
         pool.apply_async(CommunicationHandler.handle_diemwin_potential, args=[self.is_connected])
 
-        #win32pipe.PIPE_UNLIMITED_INSTANCES
+        # win32pipe.PIPE_UNLIMITED_INSTANCES
         self._pipe = win32pipe.CreateNamedPipe(pipe_name,
                                                win32pipe.PIPE_ACCESS_DUPLEX | win32file.FILE_FLAG_OVERLAPPED,
 

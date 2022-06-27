@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple, overload, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from rlgym.utils.reward_functions import RewardFunction
@@ -29,7 +29,7 @@ class CombinedReward(RewardFunction):
 
         if len(self.reward_functions) != len(self.reward_weights):
             raise ValueError(
-                ("Reward functions list length ({0}) and reward weights " \
+                ("Reward functions list length ({0}) and reward weights "
                  "length ({1}) must be equal").format(
                     len(self.reward_functions), len(self.reward_weights)
                 )

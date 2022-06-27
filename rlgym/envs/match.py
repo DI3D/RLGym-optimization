@@ -4,7 +4,7 @@ The Match object.
 
 from rlgym.envs.environment import Environment
 from rlgym.utils.gamestates import GameState
-from rlgym.utils.state_setters.wrappers.state_wrapper import StateWrapper
+# from rlgym.utils.state_setters.wrappers.state_wrapper import StateWrapper
 from rlgym.utils import common_values
 import gym.spaces
 import numpy as np
@@ -12,6 +12,10 @@ from typing import List, Union, Any
 
 
 class Match(Environment):
+    __slots__ = ["_game_speed", "_gravity", "_boost_consumption", "_team_size", "_spawn_opponents", "_tick_skip",
+                 "_reward_fn", "_terminal_conditions", "_obs_builder", "_action_parser", "_state_setter", "agents",
+                 "observation_space", "action_space", "_prev_actions", "_spectator_ids", "last_touch", "_initial_score"]
+
     def __init__(self,
                  reward_function,
                  terminal_conditions,

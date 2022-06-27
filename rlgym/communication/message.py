@@ -23,12 +23,17 @@ class Message(object):
     def _find_first(lst, target):
         n = len(target)
         r = len(lst)
-        if target == Message.RLGYM_BODY_END_TOKEN:
-            for i in range(r-4, r, 1):
-                if lst[i] == target[0] and lst[i:i + n] == target:
-                    return i
         for i in range(r):
             if lst[i] == target[0] and lst[i:i+n] == target:
+                return i
+        return None
+
+    @staticmethod
+    def _find_first_end(lst, target):
+        n = len(target)
+        r = len(lst)
+        for i in range(r-4, r, 1):
+            if lst[i] == target[0] and lst[i:i + n] == target:
                 return i
         return None
 
@@ -53,7 +58,7 @@ class Message(object):
 
         # start = Message._find_first(m, Message.RLGYM_HEADER_END_TOKEN) + len(Message.RLGYM_HEADER_END_TOKEN)
         start = header_end + len(Message.RLGYM_HEADER_END_TOKEN)
-        end = Message._find_first(m, Message.RLGYM_BODY_END_TOKEN)
+        end = Message._find_first_end(m, Message.RLGYM_BODY_END_TOKEN)
         body = m[start:end]
 
         self.body = body

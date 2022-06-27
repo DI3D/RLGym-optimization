@@ -14,6 +14,10 @@ from rlgym.gamelaunch.minimize import toggle_rl_process
 
 
 class Gym(Env):
+    __slots__ = ["_match", "observation_space", "action_space", "_launch_preference", "_use_injector", "_force_paging",
+                 "_raise_on_crash", "_comm_handler", "_local_pipe_name", "_local_pipe_id", "_game_process",
+                 "_minimizing_thread", "_minimized", "_auto_minimize", "_prev_state"]
+
     def __init__(self, match, pipe_id=0, launch_preference=LaunchPreference.EPIC, use_injector=False,
                  force_paging=False, raise_on_crash=False, auto_minimize=False):
         super().__init__()

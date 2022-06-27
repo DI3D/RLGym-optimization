@@ -5,8 +5,24 @@ A class to represent the state of a physics object from the game.
 from rlgym.utils import math
 import numpy as np
 from typing import Optional
+# import numba
+from numba import float64, boolean
+from numba.experimental import jitclass
+from numba import types
+
+spec = [
+    ("position", types.optional(float64[::1])),
+    ("quaternion", types.optional(float64[::1])),
+    ("linear_velocity", types.optional(float64[::1])),
+    ("angular_velocity", types.optional(float64[::1])),
+    ("_euler_angles", float64[:]),
+    ("_rotation_mtx", float64[:, :]),
+    ("_has_computed_rot_mtx", boolean),
+    ("_has_computed_euler_angles", boolean)
+]
 
 
+@jitclass(spec)
 class PhysicsObject(object):
     def __init__(self, position=None, quaternion=None, linear_velocity=None, angular_velocity=None):
         self.position: np.ndarray = position if position is not None else np.zeros(3)
@@ -17,7 +33,7 @@ class PhysicsObject(object):
         self.linear_velocity: np.ndarray = linear_velocity if linear_velocity is not None else np.zeros(3)
         self.angular_velocity: np.ndarray = angular_velocity if angular_velocity is not None else np.zeros(3)
         self._euler_angles: Optional[np.ndarray] = np.zeros(3)
-        self._rotation_mtx: Optional[np.ndarray] = np.zeros((3,3))
+        self._rotation_mtx: Optional[np.ndarray] = np.zeros((3, 3))
         self._has_computed_rot_mtx = False
         self._has_computed_euler_angles = False
 
@@ -109,3 +125,4 @@ class PhysicsObject(object):
                 repr.append(arg)
 
         return repr
+

@@ -41,9 +41,9 @@ class GameState(object):
         self._decode(state_floats)
 
     def _decode(self, state_vals: List[float]):
-        pads_len = GameState.BOOST_PADS_LENGTH
-        p_len = GameState.PLAYER_INFO_LENGTH
-        b_len = GameState.BALL_STATE_LENGTH
+        pads_len = self.BOOST_PADS_LENGTH
+        p_len = self.PLAYER_INFO_LENGTH
+        b_len = self.BALL_STATE_LENGTH
         start = 3
 
         num_ball_packets = 1
@@ -77,12 +77,11 @@ class GameState(object):
 
         self.players = sorted(self.players, key=lambda p: p.car_id) #YOU'RE WELCOME RANGLER, THIS WAS MY INNOVATION.
 
-    @staticmethod
-    def _decode_player(full_player_data):
+    def _decode_player(self, full_player_data):
         player_data = PlayerData()
-        c_len = GameState.PLAYER_CAR_STATE_LENGTH
+        c_len = self.PLAYER_CAR_STATE_LENGTH
         # c_len = 13
-        t_len = GameState.PLAYER_TERTIARY_INFO_LENGTH
+        t_len = self.PLAYER_TERTIARY_INFO_LENGTH
         # t_len = 11
 
         start = 2

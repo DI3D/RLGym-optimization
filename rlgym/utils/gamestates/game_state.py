@@ -1,7 +1,7 @@
 """
     Object to contain all relevant information about the game state.
 """
-
+import numpy
 import numpy as np
 from typing import Optional, List
 from rlgym.utils.gamestates import PlayerData, PhysicsObject
@@ -41,36 +41,39 @@ class GameState(object):
         self._decode(state_floats)
 
     def _decode(self, state_vals: List[float]):
-        pads_len = self.BOOST_PADS_LENGTH
-        p_len = self.PLAYER_INFO_LENGTH
-        b_len = self.BALL_STATE_LENGTH
+        # pads_len = self.BOOST_PADS_LENGTH
+        # p_len = self.PLAYER_INFO_LENGTH
+        # b_len = self.BALL_STATE_LENGTH
         start = 3
+        state_vals = numpy.asarray(state_vals)
 
         num_ball_packets = 1
-        # The state will contain the ball, the mirrored ball, every player, every player mirrored, the score for both teams, and the number of ticks since the last packet was sent.
-        num_player_packets = int((len(state_vals) - num_ball_packets * b_len - start - pads_len) / p_len)
+        # The state will contain the ball, the mirrored ball, every player, every player mirrored,
+        # the score for both teams, and the number of ticks since the last packet was sent.
+        num_player_packets = int((len(state_vals) - num_ball_packets * self.BALL_STATE_LENGTH - start - self.BOOST_PADS_LENGTH)
+                                 / self.PLAYER_INFO_LENGTH)
 
         # ticks = int(state_vals[0])
 
         self.blue_score = int(state_vals[1])
         self.orange_score = int(state_vals[2])
 
-        self.boost_pads[:] = state_vals[start:start + pads_len]
+        self.boost_pads[:] = state_vals[start:start + self.BOOST_PADS_LENGTH]
         self.inverted_boost_pads[:] = self.boost_pads[::-1]
-        start += pads_len
+        start = start + self.BOOST_PADS_LENGTH
 
-        ball_data = state_vals[start:start + b_len]
+        ball_data = state_vals[start:start + self.BALL_STATE_LENGTH]
         self.ball.decode_ball_data(np.asarray(ball_data))
-        start += b_len // 2
+        start = start + (self.BALL_STATE_LENGTH // 2)
 
-        inv_ball_data = state_vals[start:start + b_len]
+        inv_ball_data = state_vals[start:start + self.BALL_STATE_LENGTH]
         self.inverted_ball.decode_ball_data(np.asarray(inv_ball_data))
-        start += b_len // 2
+        start = start + (self.BALL_STATE_LENGTH // 2)
 
         for i in range(num_player_packets):
-            player = self._decode_player(state_vals[start:start + p_len])
+            player = self._decode_player(state_vals[start:start + self.PLAYER_INFO_LENGTH])
             self.players.append(player)
-            start += p_len
+            start = start + self.PLAYER_INFO_LENGTH
 
             if player.ball_touched:
                 self.last_touch = player.car_id
@@ -79,22 +82,22 @@ class GameState(object):
 
     def _decode_player(self, full_player_data):
         player_data = PlayerData()
-        c_len = self.PLAYER_CAR_STATE_LENGTH
+        # c_len = self.PLAYER_CAR_STATE_LENGTH
         # c_len = 13
-        t_len = self.PLAYER_TERTIARY_INFO_LENGTH
+        # t_len = self.PLAYER_TERTIARY_INFO_LENGTH
         # t_len = 11
 
         start = 2
 
-        car_data = full_player_data[start:start + c_len]
+        car_data = full_player_data[start:start + self.PLAYER_CAR_STATE_LENGTH]
         player_data.car_data.decode_car_data(np.asarray(car_data))
-        start += c_len
+        start = start + self.PLAYER_CAR_STATE_LENGTH
 
-        inv_state_data = full_player_data[start:start + c_len]
+        inv_state_data = full_player_data[start:start + self.PLAYER_CAR_STATE_LENGTH]
         player_data.inverted_car_data.decode_car_data(np.asarray(inv_state_data))
-        start += c_len
+        start = start + self.PLAYER_CAR_STATE_LENGTH
 
-        tertiary_data = full_player_data[start:start + t_len]
+        tertiary_data = full_player_data[start:start + self.PLAYER_TERTIARY_INFO_LENGTH]
 
         player_data.match_goals = int(tertiary_data[0])
         player_data.match_saves = int(tertiary_data[1])

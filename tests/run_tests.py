@@ -1,9 +1,9 @@
 import rlgym
 import traceback
-from tests.utils.state_obs import StateObs
-from tests.utils.setter_wrapper import SetterWrapper
+from utils.state_obs import StateObs
+from utils.setter_wrapper import SetterWrapper
 # from tests.cases.boost_pad_test import BoostPadTest
-from tests.cases.fps_test import FpsTest
+from cases.fps_test import FpsTest
 
 test_suite = [
     FpsTest(),

@@ -74,7 +74,7 @@ def quat_to_euler(quat):
 
 # From RLUtilities
 @numba.njit(cache=True)
-def quat_to_rot_mtx(quat: np.ndarray) -> np.ndarray:
+def quat_to_rot_mtx(quat) -> np.ndarray:
     w = -quat[0]
     x = -quat[1]
     y = -quat[2]

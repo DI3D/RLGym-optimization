@@ -4,8 +4,9 @@ from rlgym.communication import communication_exception_handler
 import win32file
 import win32pipe
 # import struct
+import numpy
 from multiprocessing.pool import ThreadPool
-import array
+# import array
 
 
 class CommunicationHandler(object):
@@ -31,11 +32,14 @@ class CommunicationHandler(object):
         try:
             for i in range(num_attempts):
                 # print("Waiting for header",header)
-                a = array.array("f")
+                # a = array.array("f")
                 code, msg_bytes = win32file.ReadFile(self._pipe, CommunicationHandler.RLGYM_DEFAULT_PIPE_SIZE)
                 # a = array.array("f")
-                a.frombytes(msg_bytes)
-                msg_floats = a.tolist()
+                arr = numpy.frombuffer(msg_bytes, dtype=numpy.float32)
+                msg_floats = arr.tolist()
+                # a.frombytes(msg_bytes)
+
+                # msg_floats = a.tolist()
                 # msg_floats = list(struct.unpack('%sf' % (len(msg_bytes)//4), msg_bytes))
                 deserialized_header = Message.deserialize_header(msg_floats)
                 # print("GOT HEADER",deserialized_header,"\nWANTED HEADER",header)
@@ -77,10 +81,12 @@ class CommunicationHandler(object):
         serialized = message.serialize()
         # print("TRANSMITTING",serialized)
         exception_code = None
-        a = array.array("f")
+        # a = array.array("f")
         try:
-            a.fromlist(serialized)
-            encoded = a.tobytes()
+            # a.fromlist(serialized)
+            arr = numpy.asarray(serialized, dtype=numpy.float32)
+            encoded = arr.tobytes()
+            # encoded = a.tobytes()
             # encoded = struct.pack('%sf' % len(serialized), *serialized)
             win32file.WriteFile(self._pipe, encoded)
 

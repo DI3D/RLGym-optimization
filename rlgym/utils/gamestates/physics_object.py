@@ -4,36 +4,42 @@ A class to represent the state of a physics object from the game.
 
 from rlgym.utils import math
 import numpy as np
-from typing import Optional
+from typing import Optional, List
 # import numba
-from numba import float64, boolean
-from numba.experimental import jitclass
-from numba import types
+# from numba import float64, boolean
+# from numba.experimental import jitclass
+# from numba import types
 
-spec = [
-    ("position", types.optional(float64[::1])),
-    ("quaternion", types.optional(float64[::1])),
-    ("linear_velocity", types.optional(float64[::1])),
-    ("angular_velocity", types.optional(float64[::1])),
-    ("_euler_angles", float64[:]),
-    ("_rotation_mtx", float64[:, :]),
-    ("_has_computed_rot_mtx", boolean),
-    ("_has_computed_euler_angles", boolean)
-]
-
-
-@jitclass(spec)
+# spec = [
+#     ("position", types.optional(float64[::1])),
+#     ("quaternion", types.optional(float64[::1])),
+#     ("linear_velocity", types.optional(float64[::1])),
+#     ("angular_velocity", types.optional(float64[::1])),
+#     ("_euler_angles", float64[:]),
+#     ("_rotation_mtx", float64[:, :]),
+#     ("_has_computed_rot_mtx", boolean),
+#     ("_has_computed_euler_angles", boolean)
+# ]
+#
+#
+# @jitclass(spec)
 class PhysicsObject(object):
     def __init__(self, position=None, quaternion=None, linear_velocity=None, angular_velocity=None):
-        self.position: np.ndarray = position if position is not None else np.zeros(3)
+        # self.position: np.ndarray = position if position is not None else np.zeros(3)
+        self.position: np.ndarray = position if position is not None else [0, 0, 0]
 
         # ones by default to prevent mathematical errors when converting quat to rot matrix on empty physics state
-        self.quaternion: np.ndarray = quaternion if quaternion is not None else np.ones(4)
+        # self.quaternion: np.ndarray = quaternion if quaternion is not None else np.ones(4)
+        self.quaternion: np.ndarray = quaternion if quaternion is not None else [1, 1, 1, 1]
 
-        self.linear_velocity: np.ndarray = linear_velocity if linear_velocity is not None else np.zeros(3)
-        self.angular_velocity: np.ndarray = angular_velocity if angular_velocity is not None else np.zeros(3)
-        self._euler_angles: Optional[np.ndarray] = np.zeros(3)
+        # self.linear_velocity: np.ndarray = linear_velocity if linear_velocity is not None else np.zeros(3)
+        self.linear_velocity: np.ndarray = linear_velocity if linear_velocity is not None else [1, 1, 1]
+        # self.angular_velocity: np.ndarray = angular_velocity if angular_velocity is not None else np.zeros(3)
+        self.angular_velocity: np.ndarray = angular_velocity if angular_velocity is not None else [0, 0, 0]
+        # self._euler_angles: Optional[np.ndarray] = np.zeros(3)
+        self._euler_angles: Optional[List] = [0, 0, 0]
         self._rotation_mtx: Optional[np.ndarray] = np.zeros((3, 3))
+        # self._rotation_mtx: Optional[np.ndarray] = np.asarray([[0, 0, 0], [0, 0, 0]])
         self._has_computed_rot_mtx = False
         self._has_computed_euler_angles = False
 
@@ -78,14 +84,14 @@ class PhysicsObject(object):
         return self.euler_angles()[2]
 
     # pitch, yaw, roll
-    def euler_angles(self) -> np.ndarray:
+    def euler_angles(self):
         if not self._has_computed_euler_angles:
             self._euler_angles = math.quat_to_euler(self.quaternion)
             self._has_computed_euler_angles = True
 
         return self._euler_angles
 
-    def rotation_mtx(self) -> np.ndarray:
+    def rotation_mtx(self):
         if not self._has_computed_rot_mtx:
             self._rotation_mtx = math.quat_to_rot_mtx(self.quaternion)
             self._has_computed_rot_mtx = True

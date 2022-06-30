@@ -4,29 +4,29 @@ A class containing all data about a player in the game.
 """
 
 from rlgym.utils.gamestates import PhysicsObject
-from numba.experimental import jitclass
-from numba import types, typeof
-
-spec=[
-    ("car_id", types.int8),
-    ("team_num", types.int8),
-    ("match_goals", types.int32),
-    ("match_saves", types.int32),
-    ("match_shots", types.int32),
-    ("match_demolishes", types.int32),
-    ("boost_pickups", types.int32),
-    ("is_demoed", types.boolean),
-    ("on_ground", types.boolean),
-    ("ball_touched", types.boolean),
-    ("has_jump", types.boolean),
-    ("has_flip", types.boolean),
-    ("boost_amount", types.float32),
-    ("car_data", typeof(PhysicsObject())),
-    ("inverted_car_data", typeof(PhysicsObject()))
-]
-
-
-@jitclass(spec)
+# from numba.experimental import jitclass
+# from numba import types, typeof
+#
+# spec=[
+#     ("car_id", types.int8),
+#     ("team_num", types.int8),
+#     ("match_goals", types.int32),
+#     ("match_saves", types.int32),
+#     ("match_shots", types.int32),
+#     ("match_demolishes", types.int32),
+#     ("boost_pickups", types.int32),
+#     ("is_demoed", types.boolean),
+#     ("on_ground", types.boolean),
+#     ("ball_touched", types.boolean),
+#     ("has_jump", types.boolean),
+#     ("has_flip", types.boolean),
+#     ("boost_amount", types.float32),
+#     ("car_data", typeof(PhysicsObject())),
+#     ("inverted_car_data", typeof(PhysicsObject()))
+# ]
+#
+#
+# @jitclass(spec)
 class PlayerData(object):
     def __init__(self):
         self.car_id: int = -1

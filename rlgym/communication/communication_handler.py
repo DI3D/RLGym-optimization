@@ -6,7 +6,7 @@ import win32pipe
 # import struct
 import numpy
 from multiprocessing.pool import ThreadPool
-# import array
+import array
 
 
 class CommunicationHandler(object):
@@ -81,12 +81,12 @@ class CommunicationHandler(object):
         serialized = message.serialize()
         # print("TRANSMITTING",serialized)
         exception_code = None
-        # a = array.array("f")
+        a = array.array("f")
         try:
-            # a.fromlist(serialized)
-            arr = numpy.asarray(serialized, dtype=numpy.float32)
-            encoded = arr.tobytes()
-            # encoded = a.tobytes()
+            a.fromlist(serialized)
+            # arr = numpy.fromiter(serialized, dtype=numpy.float32)
+            # encoded = arr.tobytes()
+            encoded = a.tobytes()
             # encoded = struct.pack('%sf' % len(serialized), *serialized)
             win32file.WriteFile(self._pipe, encoded)
 

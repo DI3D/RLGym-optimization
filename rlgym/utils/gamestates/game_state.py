@@ -2,7 +2,7 @@
     Object to contain all relevant information about the game state.
 """
 # import numpy
-import numpy as np
+# import numpy as np
 from typing import Optional, List
 from rlgym.utils.gamestates import PlayerData, PhysicsObject
 
@@ -26,8 +26,10 @@ class GameState(object):
         self.inverted_ball: PhysicsObject = PhysicsObject()
 
         # List of "booleans" (1 or 0)
-        self.boost_pads: np.ndarray = np.zeros(GameState.BOOST_PADS_LENGTH, dtype=np.float32)
-        self.inverted_boost_pads: np.ndarray = np.zeros_like(self.boost_pads, dtype=np.float32)
+        # self.boost_pads: np.ndarray = np.zeros(GameState.BOOST_PADS_LENGTH, dtype=np.float32)
+        self.boost_pads: List = []
+        # self.inverted_boost_pads: np.ndarray = np.zeros_like(self.boost_pads, dtype=np.float32)
+        self.inverted_boost_pads: List = []
 
         if state_floats is not None:
             self.decode(state_floats)

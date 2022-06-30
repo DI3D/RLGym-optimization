@@ -43,7 +43,7 @@ class PhysicsObject(object):
         self._has_computed_rot_mtx = False
         self._has_computed_euler_angles = False
 
-    def decode_car_data(self, car_data: np.ndarray):
+    def decode_car_data(self, car_data):
         """
         Function to decode the physics state of a car from the game state array.
         :param car_data: Slice of game state array containing the car data to decode.
@@ -53,7 +53,7 @@ class PhysicsObject(object):
         self.linear_velocity = car_data[7:10]
         self.angular_velocity = car_data[10:]
 
-    def decode_ball_data(self, ball_data: np.ndarray):
+    def decode_ball_data(self, ball_data):
         """
         Function to decode the physics state of the ball from the game state array.
         :param ball_data: Slice of game state array containing the ball data to decode.

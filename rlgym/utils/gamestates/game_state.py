@@ -1,7 +1,7 @@
 """
     Object to contain all relevant information about the game state.
 """
-import numpy
+# import numpy
 import numpy as np
 from typing import Optional, List
 from rlgym.utils.gamestates import PlayerData, PhysicsObject
@@ -45,7 +45,7 @@ class GameState(object):
         # p_len = self.PLAYER_INFO_LENGTH
         # b_len = self.BALL_STATE_LENGTH
         start = 3
-        state_vals = numpy.asarray(state_vals)
+        # state_vals = numpy.asarray(state_vals)
 
         num_ball_packets = 1
         # The state will contain the ball, the mirrored ball, every player, every player mirrored,
@@ -63,11 +63,11 @@ class GameState(object):
         start = start + self.BOOST_PADS_LENGTH
 
         ball_data = state_vals[start:start + self.BALL_STATE_LENGTH]
-        self.ball.decode_ball_data(np.asarray(ball_data))
+        self.ball.decode_ball_data(ball_data)
         start = start + (self.BALL_STATE_LENGTH // 2)
 
         inv_ball_data = state_vals[start:start + self.BALL_STATE_LENGTH]
-        self.inverted_ball.decode_ball_data(np.asarray(inv_ball_data))
+        self.inverted_ball.decode_ball_data(inv_ball_data)
         start = start + (self.BALL_STATE_LENGTH // 2)
 
         for i in range(num_player_packets):
@@ -90,11 +90,11 @@ class GameState(object):
         start = 2
 
         car_data = full_player_data[start:start + self.PLAYER_CAR_STATE_LENGTH]
-        player_data.car_data.decode_car_data(np.asarray(car_data))
+        player_data.car_data.decode_car_data(car_data)
         start = start + self.PLAYER_CAR_STATE_LENGTH
 
         inv_state_data = full_player_data[start:start + self.PLAYER_CAR_STATE_LENGTH]
-        player_data.inverted_car_data.decode_car_data(np.asarray(inv_state_data))
+        player_data.inverted_car_data.decode_car_data(inv_state_data)
         start = start + self.PLAYER_CAR_STATE_LENGTH
 
         tertiary_data = full_player_data[start:start + self.PLAYER_TERTIARY_INFO_LENGTH]

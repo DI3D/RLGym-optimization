@@ -11,7 +11,8 @@ class LiuDistancePlayerToBallReward(RewardFunction):
 
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         # Compensate for inside of ball being unreachable (keep max reward at 1)
-        dist = np.linalg.norm(player.car_data.position - state.ball.position) - BALL_RADIUS
+        # dist = np.linalg.norm(player.car_data.position - state.ball.position) - BALL_RADIUS
+        dist = np.linalg.norm([i - j for i, j in zip(player.car_data.position, state.ball.position)]) - BALL_RADIUS
         return np.exp(-0.5 * dist / CAR_MAX_SPEED)  # Inspired by https://arxiv.org/abs/2105.12196
 
 
@@ -25,7 +26,8 @@ class VelocityPlayerToBallReward(RewardFunction):
 
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         vel = player.car_data.linear_velocity
-        pos_diff = state.ball.position - player.car_data.position
+        # pos_diff = state.ball.position - player.car_data.position
+        pos_diff = [i - j for i, j in zip(state.ball.position, player.car_data.position)]
         if self.use_scalar_projection:
             # Vector version of v=d/t <=> t=d/v <=> 1/t=v/d
             # Max value should be max_speed / ball_radius = 2300 / 92.75 = 24.8
@@ -34,8 +36,12 @@ class VelocityPlayerToBallReward(RewardFunction):
             return inv_t
         else:
             # Regular component velocity
-            norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
-            norm_vel = vel / CAR_MAX_SPEED
+            # norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
+            partial = np.linalg.norm(pos_diff)
+            norm_pos_diff = [i / partial for i in pos_diff]
+
+            # norm_vel = vel / CAR_MAX_SPEED
+            norm_vel = [i / CAR_MAX_SPEED for i in vel]
             return float(np.dot(norm_pos_diff, norm_vel))
 
 
@@ -44,8 +50,11 @@ class FaceBallReward(RewardFunction):
         pass
 
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
-        pos_diff = state.ball.position - player.car_data.position
-        norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
+        # pos_diff = state.ball.position - player.car_data.position
+        pos_diff = [i-j for i, j in zip(state.ball.position, player.car_data.position)]
+        # norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
+        partial = np.linalg.norm(pos_diff)
+        norm_pos_diff = [i / partial for i in pos_diff]
         return float(np.dot(player.car_data.forward(), norm_pos_diff))
 
 

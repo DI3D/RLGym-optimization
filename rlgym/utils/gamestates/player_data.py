@@ -42,8 +42,8 @@ class PlayerData(object):
         self.has_jump: bool = False
         self.has_flip: bool = False
         self.boost_amount: float = -1
-        self.car_data: PhysicsObject = PhysicsObject(None, None, None, None)
-        self.inverted_car_data: PhysicsObject = PhysicsObject(None, None, None, None)
+        self.car_data: PhysicsObject = PhysicsObject()
+        self.inverted_car_data: PhysicsObject = PhysicsObject()
 
     # def __str__(self):
     #     output = "****PLAYER DATA OBJECT****\n" \

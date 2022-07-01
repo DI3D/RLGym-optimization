@@ -2,6 +2,7 @@
 A basic library for useful mathematical operations.
 """
 
+from typing import Union
 import numpy as np
 import numba
 
@@ -25,7 +26,7 @@ def vector_projection(vec, dest_vec, mag_squared=None):
     return projection
 
 
-def scalar_projection(vec, dest_vec):
+def scalar_projection(vec, dest_vec) -> Union[np.ndarray, float]:
     norm = vecmag(dest_vec)
 
     if norm == 0:
@@ -35,12 +36,12 @@ def scalar_projection(vec, dest_vec):
     return dot
 
 
-def squared_vecmag(vec):
+def squared_vecmag(vec) -> float:
     x = np.linalg.norm(vec)
     return x * x
 
 
-def vecmag(vec):
+def vecmag(vec) -> float:
     norm = np.linalg.norm(vec)
     return norm
 
@@ -73,7 +74,7 @@ def quat_to_euler(quat):
 
 
 # From RLUtilities
-@numba.njit(cache=True)
+# @numba.njit(cache=True)
 def quat_to_rot_mtx(quat) -> np.ndarray:
     w = -quat[0]
     x = -quat[1]
@@ -82,9 +83,11 @@ def quat_to_rot_mtx(quat) -> np.ndarray:
 
     theta = np.zeros((3, 3))
 
-    norm = np.dot(quat, quat)
+    # norm = np.dot(quat, quat)
+    norm = sum([i*j for i, j in zip(quat, quat)])
     if norm != 0:
         s = 1.0 / norm
+        # s = [1.0/i for i in norm]
 
         # front direction
         theta[0, 0] = 1.0 - 2.0 * s * (y * y + z * z)

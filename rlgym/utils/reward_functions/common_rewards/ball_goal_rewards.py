@@ -17,12 +17,16 @@ class LiuDistanceBallToGoalReward(RewardFunction):
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         if player.team_num == BLUE_TEAM and not self.own_goal \
                 or player.team_num == ORANGE_TEAM and self.own_goal:
-            objective = np.array(ORANGE_GOAL_BACK)
+            objective = ORANGE_GOAL_BACK
         else:
-            objective = np.array(BLUE_GOAL_BACK)
+            objective = BLUE_GOAL_BACK
 
         # Compensate for moving objective to back of net
-        dist = np.linalg.norm(state.ball.position - objective) - (BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
+        # dist = np.linalg.norm([i - j for i, j in zip(state.ball.position - objective)]) - (
+        # BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
+        dist = np.linalg.norm([i - j for i, j in zip([i - j for i, j in zip(state.ball.position, objective)])]) - (
+                    BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
+        # dist = np.linalg.norm(state.ball.position - objective) - (BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
         return np.exp(-0.5 * dist / BALL_MAX_SPEED)  # Inspired by https://arxiv.org/abs/2105.12196
 
 
@@ -38,12 +42,13 @@ class VelocityBallToGoalReward(RewardFunction):
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         if player.team_num == BLUE_TEAM and not self.own_goal \
                 or player.team_num == ORANGE_TEAM and self.own_goal:
-            objective = np.array(ORANGE_GOAL_BACK)
+            objective = ORANGE_GOAL_BACK
         else:
-            objective = np.array(BLUE_GOAL_BACK)
+            objective = BLUE_GOAL_BACK
 
         vel = state.ball.linear_velocity
-        pos_diff = objective - state.ball.position
+        # pos_diff = objective - state.ball.position
+        pos_diff = [i - j for i, j in zip(objective, state.ball.position)]
         if self.use_scalar_projection:
             # Vector version of v=d/t <=> t=d/v <=> 1/t=v/d
             # Max value should be max_speed / ball_radius = 2300 / 94 = 24.5
@@ -52,8 +57,10 @@ class VelocityBallToGoalReward(RewardFunction):
             return inv_t
         else:
             # Regular component velocity
-            norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
-            norm_vel = vel / BALL_MAX_SPEED
+            # norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
+            norm_pos_diff = [i / np.linalg.norm(pos_diff) for i in pos_diff]
+            # norm_vel = vel / BALL_MAX_SPEED
+            norm_vel = [i / BALL_MAX_SPEED for i in vel]
             return float(np.dot(norm_pos_diff, norm_vel))
 
 

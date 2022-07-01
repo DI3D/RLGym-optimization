@@ -96,15 +96,19 @@ class AlignBallGoal(RewardFunction):
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         ball = state.ball.position
         pos = player.car_data.position
-        protecc = np.array(BLUE_GOAL_BACK)
-        attacc = np.array(ORANGE_GOAL_BACK)
+        protecc = BLUE_GOAL_BACK
+        attacc = ORANGE_GOAL_BACK
         if player.team_num == ORANGE_TEAM:
             protecc, attacc = attacc, protecc
 
         # Align player->ball and net->player vectors
-        defensive_reward = self.defense * math.cosine_similarity(ball - pos, pos - protecc)
+        # defensive_reward = self.defense * math.cosine_similarity(ball - pos, pos - protecc)
+        defensive_reward = self.defense * math.cosine_similarity([i-j for i, j in zip(ball, pos)],
+                                                                 [i-j for i, j in zip(pos, protecc)])
 
         # Align player->ball and player->net vectors
-        offensive_reward = self.offense * math.cosine_similarity(ball - pos, attacc - pos)
+        # offensive_reward = self.offense * math.cosine_similarity(ball - pos, attacc - pos)
+        offensive_reward = self.offense * math.cosine_similarity([i-j for i, j in zip(ball, pos)],
+                                                                 [i-j for i, j in zip(attacc, pos)])
 
         return defensive_reward + offensive_reward

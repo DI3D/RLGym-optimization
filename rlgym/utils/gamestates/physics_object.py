@@ -26,16 +26,16 @@ from typing import Optional, List
 class PhysicsObject(object):
     def __init__(self, position=None, quaternion=None, linear_velocity=None, angular_velocity=None):
         # self.position: np.ndarray = position if position is not None else np.zeros(3)
-        self.position: np.ndarray = position if position is not None else [0, 0, 0]
+        self.position: List = position if position is not None else [0, 0, 0]
 
         # ones by default to prevent mathematical errors when converting quat to rot matrix on empty physics state
         # self.quaternion: np.ndarray = quaternion if quaternion is not None else np.ones(4)
-        self.quaternion: np.ndarray = quaternion if quaternion is not None else [1, 1, 1, 1]
+        self.quaternion: List = quaternion if quaternion is not None else [1, 1, 1, 1]
 
         # self.linear_velocity: np.ndarray = linear_velocity if linear_velocity is not None else np.zeros(3)
-        self.linear_velocity: np.ndarray = linear_velocity if linear_velocity is not None else [1, 1, 1]
+        self.linear_velocity: List = linear_velocity if linear_velocity is not None else [1, 1, 1]
         # self.angular_velocity: np.ndarray = angular_velocity if angular_velocity is not None else np.zeros(3)
-        self.angular_velocity: np.ndarray = angular_velocity if angular_velocity is not None else [0, 0, 0]
+        self.angular_velocity: List = angular_velocity if angular_velocity is not None else [0, 0, 0]
         # self._euler_angles: Optional[np.ndarray] = np.zeros(3)
         self._euler_angles: Optional[List] = [0, 0, 0]
         self._rotation_mtx: Optional[np.ndarray] = np.zeros((3, 3))

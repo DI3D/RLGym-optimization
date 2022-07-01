@@ -27,14 +27,15 @@ def vector_projection(vec, dest_vec, mag_squared=None):
 
 
 def scalar_projection(vec, dest_vec) -> Union[np.ndarray, float]:
-    norm = vecmag(dest_vec)
+    dest_vec_arr = np.fromiter(dest_vec, dtype=np.float64, count=len(dest_vec))
+    vec_arr = np.fromiter(vec, dtype=np.float64, count=len(vec))
+    norm = vecmag(dest_vec_arr)
 
     if norm == 0:
         return 0
 
-    dot = np.dot(vec, dest_vec) / norm
+    dot = np.dot(vec_arr, dest_vec_arr) / norm
     return dot
-
 
 def squared_vecmag(vec) -> float:
     x = np.linalg.norm(vec)

@@ -2,8 +2,7 @@ import numpy as np
 import math as mathpy
 
 from rlgym.utils import math
-from rlgym.utils.common_values import BLUE_TEAM, BLUE_GOAL_BACK, ORANGE_GOAL_BACK, ORANGE_TEAM, BALL_MAX_SPEED, \
-    CAR_MAX_SPEED
+from rlgym.utils.common_values import BLUE_TEAM, BLUE_GOAL_BACK, ORANGE_GOAL_BACK, ORANGE_TEAM, CAR_MAX_SPEED
 from rlgym.utils.gamestates import GameState, PlayerData
 from rlgym.utils.reward_functions import RewardFunction
 
@@ -33,8 +32,8 @@ class EventReward(RewardFunction):
         else:
             team, opponent = state.orange_score, state.blue_score
 
-        return np.array([player.match_goals, team, opponent, player.ball_touched, player.match_shots,
-                         player.match_saves, player.match_demolishes, player.boost_amount])
+        return [player.match_goals, team, opponent, player.ball_touched, player.match_shots,
+                player.match_saves, player.match_demolishes, player.boost_amount]
 
     def reset(self, initial_state: GameState, optional_data=None):
         # Update every reset since rocket league may crash and be restarted with clean values
@@ -46,10 +45,12 @@ class EventReward(RewardFunction):
         old_values = self.last_registered_values[player.car_id]
         new_values = self._extract_values(player, state)
 
-        diff_values = new_values - old_values
-        diff_values[diff_values < 0] = 0  # We only care about increasing values
+        # diff_values = new_values - old_values
+        diff_values = [i - j for i, j in zip(new_values, old_values)]
+        # diff_values[diff_values < 0] = 0  # We only care about increasing values
+        diff_values = [x if x > 0 else 0 for x in diff_values]
 
-        reward = sum([i*j for i, j in zip(self.weights, diff_values)])
+        reward = sum([i * j for i, j in zip(self.weights, diff_values)])
         # reward = np.dot(self.weights, diff_values)
 
         self.last_registered_values[player.car_id] = new_values
@@ -106,12 +107,12 @@ class AlignBallGoal(RewardFunction):
 
         # Align player->ball and net->player vectors
         # defensive_reward = self.defense * math.cosine_similarity(ball - pos, pos - protecc)
-        defensive_reward = self.defense * math.cosine_similarity([i-j for i, j in zip(ball, pos)],
-                                                                 [i-j for i, j in zip(pos, protecc)])
+        defensive_reward = self.defense * math.cosine_similarity_1d([i - j for i, j in zip(ball, pos)],
+                                                                    [i - j for i, j in zip(pos, protecc)])
 
         # Align player->ball and player->net vectors
         # offensive_reward = self.offense * math.cosine_similarity(ball - pos, attacc - pos)
-        offensive_reward = self.offense * math.cosine_similarity([i-j for i, j in zip(ball, pos)],
-                                                                 [i-j for i, j in zip(attacc, pos)])
+        offensive_reward = self.offense * math.cosine_similarity_1d([i - j for i, j in zip(ball, pos)],
+                                                                    [i - j for i, j in zip(attacc, pos)])
 
         return defensive_reward + offensive_reward

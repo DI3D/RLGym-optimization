@@ -117,7 +117,8 @@ class Match(Environment):
         current_score = state.blue_score - state.orange_score
         return current_score - self._initial_score
 
-    def parse_state(self, state_str: List[float]) -> GameState:
+    @staticmethod
+    def parse_state(state_str: List[float]) -> GameState:
         state = GameState(state_str)
         return state
 

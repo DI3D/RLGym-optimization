@@ -24,8 +24,11 @@ class LiuDistanceBallToGoalReward(RewardFunction):
         # Compensate for moving objective to back of net
         # dist = np.linalg.norm([i - j for i, j in zip(state.ball.position - objective)]) - (
         # BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
-        dist = np.linalg.norm([i - j for i, j in zip([i - j for i, j in zip(state.ball.position, objective)])]) - (
-                    BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
+        # dist = np.linalg.norm([i - j for i, j in zip([i - j for i, j in zip(state.ball.position, objective)])]) - (
+        #             BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
+        dist = math.norm_1d([i - j for i, j in zip([i - j for i, j in zip(state.ball.position, objective)])]) - (
+            BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS
+        )
         # dist = np.linalg.norm(state.ball.position - objective) - (BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
         return np.exp(-0.5 * dist / BALL_MAX_SPEED)  # Inspired by https://arxiv.org/abs/2105.12196
 
@@ -56,7 +59,7 @@ class VelocityBallToGoalReward(RewardFunction):
             # Vector version of v=d/t <=> t=d/v <=> 1/t=v/d
             # Max value should be max_speed / ball_radius = 2300 / 94 = 24.5
             # Used to guide the agent towards the ball
-            inv_t = math.scalar_projection(vel, pos_diff)
+            inv_t = math.scalar_projection_1d(vel, pos_diff)
             return inv_t
         else:
             # Regular component velocity

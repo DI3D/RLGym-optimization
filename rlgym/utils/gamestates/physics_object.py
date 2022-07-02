@@ -93,7 +93,7 @@ class PhysicsObject(object):
 
     def rotation_mtx(self):
         if not self._has_computed_rot_mtx:
-            self._rotation_mtx = math.quat_to_rot_mtx(self.quaternion)
+            self._rotation_mtx = math.quat_to_rot_mtx_1d(self.quaternion)
             self._has_computed_rot_mtx = True
 
         return self._rotation_mtx

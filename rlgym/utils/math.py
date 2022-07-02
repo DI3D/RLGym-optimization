@@ -2,7 +2,7 @@
 A basic library for useful mathematical operations.
 """
 
-from typing import Union
+from typing import Union, List
 import math
 import numpy as np
 import numba
@@ -10,6 +10,24 @@ import numba
 
 def get_dist(x, y):
     return np.subtract(x, y)
+
+
+def vector_projection_1d(vec, dest_vec, mag_squared=None):
+    """optimized efficiency for 1d lists"""
+    if mag_squared is None:
+        norm = vecmag(dest_vec)
+        if norm == 0:
+            return dest_vec
+        mag_squared = norm * norm
+
+    if mag_squared == 0:
+        return dest_vec
+
+    # dot = np.dot(vec, dest_vec)
+    dot = sum([(i*j) for i, j in zip(vec, dest_vec)])
+    # projection = np.multiply(np.divide(dot, mag_squared), dest_vec)
+    projection = [i*j for i, j in zip([x/y for x, y in zip(dot, mag_squared)], dest_vec)]
+    return projection
 
 
 def vector_projection(vec, dest_vec, mag_squared=None):
@@ -27,32 +45,50 @@ def vector_projection(vec, dest_vec, mag_squared=None):
     return projection
 
 
-def scalar_projection(vec, dest_vec) -> Union[np.ndarray, float]:
-    # dest_vec_arr = np.fromiter(dest_vec, dtype=np.float64, count=len(dest_vec))
-    # vec_arr = np.fromiter(vec, dtype=np.float64, count=len(vec))
+def scalar_projection_1d(vec, dest_vec) -> Union[List, float]:
+    """optimized efficiency for 1d lists"""
     norm = vecmag(dest_vec)
 
     if norm == 0:
         return 0
 
-    # dot = np.dot(vec_arr, dest_vec_arr) / norm
     dot = sum([(i*j) for i, j in zip(vec, dest_vec)])/norm
     return dot
 
 
+def scalar_projection(vec, dest_vec) -> Union[np.ndarray, float]:
+    norm = vecmag(dest_vec)
+
+    if norm == 0:
+        return 0
+
+    dot = np.dot(vec, dest_vec) / norm
+    return dot
+
+
 def squared_vecmag(vec) -> float:
-    x = np.linalg.norm(vec)
+    x = math.sqrt(sum([x * x for x in vec]))
+    # x = np.linalg.norm(vec)
     return x * x
 
 
-def norm_1d(vec) -> float:
-    norm = math.sqrt(sum([pow((abs(x)), 2) for x in vec]))
+def norm_1d(vec: List) -> float:
+    """optimized efficiency for 1d lists"""
+    # assuming non-complex 1d list
+    norm = math.sqrt(sum([x*x for x in vec]))
+    # norm = np.linalg.norm(vec)
+    return norm
+
+
+def vecmag_1d(vec) -> float:
+    """optimized efficiency for 1d lists"""
+    # norm = np.linalg.norm(vec)
+    norm = norm_1d(vec)
     return norm
 
 
 def vecmag(vec) -> float:
-    # norm = np.linalg.norm(vec)
-    norm = norm_1d(vec)
+    norm = np.linalg.norm(vec)
     return norm
 
 
@@ -60,11 +96,21 @@ def unitvec(vec):
     return np.divide(vec, vecmag(vec))
 
 
+def cosine_similarity_1d(a, b):
+    # return np.dot(a / np.linalg.norm(a), b / np.linalg.norm(b))
+    a_norm = math.sqrt(sum([x * x for x in a]))
+    b_norm = math.sqrt(sum([x * x for x in b]))
+    return sum([i*j for i, j in zip([x/a_norm for x in a], [x/b_norm for x in b])])
+
+
 def cosine_similarity(a, b):
-    return np.dot(a / np.linalg.norm(a), b / np.linalg.norm(b))
+    # return np.dot(a / np.linalg.norm(a), b / np.linalg.norm(b))
+    a_norm = math.sqrt(sum([x * x for x in a]))
+    b_norm = math.sqrt(sum([x * x for x in b]))
+    return sum([i*j for i, j in zip([x/a_norm for x in a], [x/b_norm for x in b])])
 
 
-@numba.njit(cache=True)
+# @numba.njit(cache=True)
 def quat_to_euler(quat):
     w, x, y, z = quat
     sinr_cosp = 2 * (w * x + y * z)
@@ -72,20 +118,52 @@ def quat_to_euler(quat):
     sinp = 2 * (w * y - z * x)
     siny_cosp = 2 * (w * z + x * y)
     cosy_cosp = 1 - 2 * (y * y + z * z)
-
-    roll = np.arctan2(sinr_cosp, cosr_cosp)
+    roll = math.atan2(sinr_cosp, cosr_cosp)
+    # roll = np.arctan2(sinr_cosp, cosr_cosp)
     if abs(sinp) > 1:
         pitch = np.pi / 2
     else:
-        pitch = np.arcsin(sinp)
-    yaw = np.arctan2(siny_cosp, cosy_cosp)
+        # pitch = np.arcsin(sinp)
+        pitch = math.asin(sinp)
+    # yaw = np.arctan2(siny_cosp, cosy_cosp)
+    yaw = math.atan2(siny_cosp, cosy_cosp)
 
-    return np.array([-pitch, yaw, -roll])
+    return [-pitch, yaw, -roll]
 
 
 # From RLUtilities
 # @numba.njit(cache=True)
 def quat_to_rot_mtx(quat) -> np.ndarray:
+    w = -quat[0]
+    x = -quat[1]
+    y = -quat[2]
+    z = -quat[3]
+
+    theta = np.zeros((3, 3))
+
+    norm = np.dot(quat, quat)
+    if norm != 0:
+        s = 1.0 / norm
+
+        # front direction
+        theta[0, 0] = 1.0 - 2.0 * s * (y * y + z * z)
+        theta[1, 0] = 2.0 * s * (x * y + z * w)
+        theta[2, 0] = 2.0 * s * (x * z - y * w)
+
+        # left direction
+        theta[0, 1] = 2.0 * s * (x * y - z * w)
+        theta[1, 1] = 1.0 - 2.0 * s * (x * x + z * z)
+        theta[2, 1] = 2.0 * s * (y * z + x * w)
+
+        # up direction
+        theta[0, 2] = 2.0 * s * (x * z + y * w)
+        theta[1, 2] = 2.0 * s * (y * z - x * w)
+        theta[2, 2] = 1.0 - 2.0 * s * (x * x + y * y)
+
+    return theta
+
+
+def quat_to_rot_mtx_1d(quat) -> np.ndarray:
     w = -quat[0]
     x = -quat[1]
     y = -quat[2]

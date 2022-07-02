@@ -26,7 +26,7 @@ class AdvancedObs(ObsBuilder):
             inverted = False
             ball = state.ball
             pads = state.boost_pads
-        # TODO make function in math.py that automatically does sub/divide/add/etc. list comprehension for the user
+        # TODO make function in math.py that automatically does sub/divide/add/etc. list comprehension for the user?
 
         # obs = [[i / self.POS_STD for i in ball.position],
         #        # ball.position / self.POS_STD
@@ -70,7 +70,7 @@ class AdvancedObs(ObsBuilder):
 
         obs.extend(allies)
         obs.extend(enemies)
-        # this is to flatten, change this somehow?
+        # needs to be a numpy array
         return np.fromiter(obs, dtype=np.float32, count=len(obs))
 
     def _add_player_to_obs(self, obs: List, player: PlayerData, ball: PhysicsObject, inverted: bool):

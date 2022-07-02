@@ -3,6 +3,7 @@ A basic library for useful mathematical operations.
 """
 
 from typing import Union
+import math
 import numpy as np
 import numba
 
@@ -27,23 +28,31 @@ def vector_projection(vec, dest_vec, mag_squared=None):
 
 
 def scalar_projection(vec, dest_vec) -> Union[np.ndarray, float]:
-    dest_vec_arr = np.fromiter(dest_vec, dtype=np.float64, count=len(dest_vec))
-    vec_arr = np.fromiter(vec, dtype=np.float64, count=len(vec))
-    norm = vecmag(dest_vec_arr)
+    # dest_vec_arr = np.fromiter(dest_vec, dtype=np.float64, count=len(dest_vec))
+    # vec_arr = np.fromiter(vec, dtype=np.float64, count=len(vec))
+    norm = vecmag(dest_vec)
 
     if norm == 0:
         return 0
 
-    dot = np.dot(vec_arr, dest_vec_arr) / norm
+    # dot = np.dot(vec_arr, dest_vec_arr) / norm
+    dot = sum([(i*j) for i, j in zip(vec, dest_vec)])/norm
     return dot
+
 
 def squared_vecmag(vec) -> float:
     x = np.linalg.norm(vec)
     return x * x
 
 
+def norm_1d(vec) -> float:
+    norm = math.sqrt(sum([pow((abs(x)), 2) for x in vec]))
+    return norm
+
+
 def vecmag(vec) -> float:
-    norm = np.linalg.norm(vec)
+    # norm = np.linalg.norm(vec)
+    norm = norm_1d(vec)
     return norm
 
 

@@ -25,7 +25,7 @@ class CombinedReward(RewardFunction):
         super().__init__()
 
         self.reward_functions = reward_functions
-        self.reward_weights = reward_weights or np.ones_like(reward_functions)
+        self.reward_weights = reward_weights or [1.0 for x in reward_functions]
 
         if len(self.reward_functions) != len(self.reward_weights):
             raise ValueError(
@@ -82,7 +82,8 @@ class CombinedReward(RewardFunction):
             for func in self.reward_functions
         ]
 
-        return float(np.dot(self.reward_weights, rewards))
+        # return float(np.dot(self.reward_weights, rewards))
+        return sum([i*j for i, j in zip(self.reward_weights, rewards)])
 
     def get_final_reward(
             self,
@@ -104,4 +105,5 @@ class CombinedReward(RewardFunction):
             for func in self.reward_functions
         ]
 
-        return float(np.dot(self.reward_weights, rewards))
+        # return float(np.dot(self.reward_weights, rewards))
+        return sum([i*j for i, j in zip(self.reward_weights, rewards)])

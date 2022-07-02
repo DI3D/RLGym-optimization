@@ -49,7 +49,9 @@ class VelocityBallToGoalReward(RewardFunction):
         vel = state.ball.linear_velocity
         # pos_diff = objective - state.ball.position
         pos_diff = [i - j for i, j in zip(objective, state.ball.position)]
-        pos_diff_normed = np.linalg.norm(pos_diff)
+        # pos_diff_arr = np.fromiter(pos_diff, dtype=np.float64, count=len(pos_diff))
+        # pos_diff_normed = np.linalg.norm(pos_diff_arr)
+        # pos_diff_normed = math.norm_1d(pos_diff)
         if self.use_scalar_projection:
             # Vector version of v=d/t <=> t=d/v <=> 1/t=v/d
             # Max value should be max_speed / ball_radius = 2300 / 94 = 24.5
@@ -59,10 +61,12 @@ class VelocityBallToGoalReward(RewardFunction):
         else:
             # Regular component velocity
             # norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
+            pos_diff_normed = math.norm_1d(pos_diff)
             norm_pos_diff = [i / pos_diff_normed for i in pos_diff]
             # norm_vel = vel / BALL_MAX_SPEED
             norm_vel = [i / BALL_MAX_SPEED for i in vel]
-            return float(np.dot(norm_pos_diff, norm_vel))
+            # return float(np.dot(norm_pos_diff, norm_vel))
+            return sum([i*j for i, j in zip(norm_pos_diff, norm_vel)])
 
 
 class BallYCoordinateReward(RewardFunction):

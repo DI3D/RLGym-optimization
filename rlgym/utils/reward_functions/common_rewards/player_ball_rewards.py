@@ -37,12 +37,14 @@ class VelocityPlayerToBallReward(RewardFunction):
         else:
             # Regular component velocity
             # norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
-            partial = np.linalg.norm(pos_diff)
+            partial = math.norm_1d(pos_diff)
+            # partial = np.linalg.norm(pos_diff)
             norm_pos_diff = [i / partial for i in pos_diff]
 
             # norm_vel = vel / CAR_MAX_SPEED
             norm_vel = [i / CAR_MAX_SPEED for i in vel]
-            return float(np.dot(norm_pos_diff, norm_vel))
+            # return float(np.dot(norm_pos_diff, norm_vel))
+            return sum([i*j for i, j in zip(norm_pos_diff, norm_vel)])
 
 
 class FaceBallReward(RewardFunction):
@@ -53,9 +55,11 @@ class FaceBallReward(RewardFunction):
         # pos_diff = state.ball.position - player.car_data.position
         pos_diff = [i-j for i, j in zip(state.ball.position, player.car_data.position)]
         # norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
-        partial = np.linalg.norm(pos_diff)
+        partial = math.norm_1d(pos_diff)
+        # partial = np.linalg.norm(pos_diff)
         norm_pos_diff = [i / partial for i in pos_diff]
-        return float(np.dot(player.car_data.forward(), norm_pos_diff))
+        # return float(np.dot(player.car_data.forward(), norm_pos_diff))
+        return sum([i * j for i, j in zip(player.car_data.forward(), norm_pos_diff)])
 
 
 class TouchBallReward(RewardFunction):

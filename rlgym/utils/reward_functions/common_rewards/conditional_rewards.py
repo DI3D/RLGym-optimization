@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 import numpy as np
+from rlgym.utils import math
 
 from rlgym.utils import RewardFunction
 from rlgym.utils.common_values import BLUE_TEAM, ORANGE_TEAM
@@ -41,7 +42,8 @@ class RewardIfClosestToBall(ConditionalRewardFunction):
         for player2 in state.players:
             if not self.team_only or player2.team_num == player.team_num:
                 # dist2 = np.linalg.norm(player2.car_data.position - state.ball.position)
-                dist2 = np.linalg.norm([i - j for i, j in zip(player2.car_data.position, state.ball.position)])
+                # dist2 = np.linalg.norm([i - j for i, j in zip(player2.car_data.position, state.ball.position)])
+                dist2 = math.norm_1d([i - j for i, j in zip(player2.car_data.position, state.ball.position)])
                 if dist2 < dist:
                     return False
         return True

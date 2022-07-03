@@ -1,4 +1,6 @@
 import math
+
+import gym.spaces
 import numpy as np
 from typing import Any, List
 from rlgym.utils import common_values
@@ -12,6 +14,9 @@ class AdvancedObs(ObsBuilder):
 
     def __init__(self):
         super().__init__()
+
+    def get_obs_space(self) -> gym.spaces.Space:
+        return gym.spaces.Box(np.inf, -np.inf, shape=(107,))
 
     def reset(self, initial_state: GameState):
         pass

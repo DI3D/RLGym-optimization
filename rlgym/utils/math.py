@@ -47,7 +47,7 @@ def vector_projection(vec, dest_vec, mag_squared=None):
 
 def scalar_projection_1d(vec, dest_vec) -> Union[List, float]:
     """optimized efficiency for 1d lists"""
-    norm = vecmag(dest_vec)
+    norm = vecmag_1d(dest_vec)
 
     if norm == 0:
         return 0
@@ -121,7 +121,7 @@ def quat_to_euler(quat):
     roll = math.atan2(sinr_cosp, cosr_cosp)
     # roll = np.arctan2(sinr_cosp, cosr_cosp)
     if abs(sinp) > 1:
-        pitch = np.pi / 2
+        pitch = math.pi / 2
     else:
         # pitch = np.arcsin(sinp)
         pitch = math.asin(sinp)

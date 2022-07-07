@@ -155,3 +155,12 @@ class CommunicationHandler(object):
                     return
             except:
                 time.sleep(2)
+
+        try:
+            app = pywinauto.Application().connect(title='DIEmWin', visible_only=True)
+            if app.is_process_running():
+                app.window(title='DIEmWin', visible_only=True).close()
+                print("DIEmWin detector successfully closed window")
+                return
+        except:
+            pass

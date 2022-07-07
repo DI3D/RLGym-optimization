@@ -1,4 +1,5 @@
 import numpy as np
+import math as math_py
 
 from rlgym.utils import RewardFunction, math
 from rlgym.utils.common_values import BLUE_TEAM, ORANGE_TEAM, ORANGE_GOAL_BACK, \
@@ -10,6 +11,7 @@ class LiuDistanceBallToGoalReward(RewardFunction):
     def __init__(self, own_goal=False):
         super().__init__()
         self.own_goal = own_goal
+        self.partial = (BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
 
     def reset(self, initial_state: GameState):
         pass
@@ -26,11 +28,10 @@ class LiuDistanceBallToGoalReward(RewardFunction):
         # BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
         # dist = np.linalg.norm([i - j for i, j in zip([i - j for i, j in zip(state.ball.position, objective)])]) - (
         #             BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
-        dist = math.norm_1d([i - j for i, j in zip([i - j for i, j in zip(state.ball.position, objective)])]) - (
-            BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS
-        )
+        dist = math.norm_1d([i - j for i, j in zip([i - j for i, j in zip(state.ball.position, objective)])])\
+               - self.partial
         # dist = np.linalg.norm(state.ball.position - objective) - (BACK_NET_Y - BACK_WALL_Y + BALL_RADIUS)
-        return np.exp(-0.5 * dist / BALL_MAX_SPEED)  # Inspired by https://arxiv.org/abs/2105.12196
+        return math_py.exp(-0.5 * dist / BALL_MAX_SPEED)  # Inspired by https://arxiv.org/abs/2105.12196
 
 
 class VelocityBallToGoalReward(RewardFunction):

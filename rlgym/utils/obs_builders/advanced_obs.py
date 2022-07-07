@@ -2,13 +2,14 @@ import math
 
 import gym.spaces
 import numpy as np
-from typing import Any, List
+from typing import List
 from rlgym.utils import common_values
 from rlgym.utils.gamestates import PlayerData, GameState, PhysicsObject
 from rlgym.utils.obs_builders import ObsBuilder
 
 
 class AdvancedObs(ObsBuilder):
+    """Rebuilt AdvancedObs from RLGym to handle lists, also to use as an example potentially for conversions"""
     POS_STD = 2300  # If you read this and wonder why, ping Rangler in the dead of night.
     ANG_STD = math.pi
 
@@ -16,12 +17,12 @@ class AdvancedObs(ObsBuilder):
         super().__init__()
 
     def get_obs_space(self) -> gym.spaces.Space:
-        return gym.spaces.Box(np.inf, -np.inf, shape=(107,))
+        return gym.spaces.Box(-np.inf, np.inf, shape=(107,))
 
     def reset(self, initial_state: GameState):
         pass
 
-    def build_obs(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> Any:
+    def build_obs(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> np.ndarray:
 
         if player.team_num == common_values.ORANGE_TEAM:
             inverted = True
@@ -31,7 +32,6 @@ class AdvancedObs(ObsBuilder):
             inverted = False
             ball = state.ball
             pads = state.boost_pads
-        # TODO make function in math.py that automatically does sub/divide/add/etc. list comprehension for the user?
 
         # obs = [[i / self.POS_STD for i in ball.position],
         #        # ball.position / self.POS_STD

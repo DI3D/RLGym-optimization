@@ -3,7 +3,9 @@ A class to represent the state of a physics object from the game.
 """
 
 from rlgym.utils import math
-import numpy as np
+# import numpy as np
+from numpy import ndarray
+from numpy import zeros
 from typing import Optional, List
 # import numba
 # from numba import float64, boolean
@@ -38,7 +40,7 @@ class PhysicsObject(object):
         self.angular_velocity: List = angular_velocity if angular_velocity is not None else [0, 0, 0]
         # self._euler_angles: Optional[np.ndarray] = np.zeros(3)
         self._euler_angles: Optional[List] = [0, 0, 0]
-        self._rotation_mtx: Optional[np.ndarray] = np.zeros((3, 3))
+        self._rotation_mtx: Optional[ndarray] = zeros((3, 3))
         # self._rotation_mtx: Optional[np.ndarray] = np.asarray([[0, 0, 0], [0, 0, 0]])
         self._has_computed_rot_mtx = False
         self._has_computed_euler_angles = False
@@ -62,16 +64,16 @@ class PhysicsObject(object):
         self.linear_velocity = ball_data[3:6]
         self.angular_velocity = ball_data[6:9]
 
-    def forward(self) -> np.ndarray:
+    def forward(self) -> ndarray:
         return self.rotation_mtx()[:, 0]
 
-    def right(self) -> np.ndarray:
+    def right(self) -> ndarray:
         return self.rotation_mtx()[:, 1]
 
-    def left(self) -> np.ndarray:
+    def left(self) -> ndarray:
         return self.rotation_mtx()[:, 1] * -1
 
-    def up(self) -> np.ndarray:
+    def up(self) -> ndarray:
         return self.rotation_mtx()[:, 2]
 
     def pitch(self) -> float:
@@ -131,4 +133,3 @@ class PhysicsObject(object):
                 repr.append(arg)
 
         return repr
-

@@ -6,16 +6,21 @@ from typing import Union, List
 import math
 import numpy as np
 import numba
+import random
 
 
-def get_dist(x, y):
+def get_dist(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return np.subtract(x, y)
 
 
-def vector_projection_1d(vec, dest_vec, mag_squared=None):
+def get_dist_1d(x: List, y: List) -> List:
+    return [i-j for i, j in zip(x, y)]
+
+
+def vector_projection_1d(vec: List, dest_vec: List, mag_squared=None) -> List:
     """optimized efficiency for 1d lists"""
     if mag_squared is None:
-        norm = vecmag(dest_vec)
+        norm = vecmag_1d(dest_vec)
         if norm == 0:
             return dest_vec
         mag_squared = norm * norm
@@ -30,7 +35,7 @@ def vector_projection_1d(vec, dest_vec, mag_squared=None):
     return projection
 
 
-def vector_projection(vec, dest_vec, mag_squared=None):
+def vector_projection(vec: np.ndarray, dest_vec: np.ndarray, mag_squared=None) -> np.ndarray:
     if mag_squared is None:
         norm = vecmag(dest_vec)
         if norm == 0:
@@ -45,7 +50,7 @@ def vector_projection(vec, dest_vec, mag_squared=None):
     return projection
 
 
-def scalar_projection_1d(vec, dest_vec) -> Union[List, float]:
+def scalar_projection_1d(vec: List, dest_vec: List) -> Union[List, float]:
     """optimized efficiency for 1d lists"""
     norm = vecmag_1d(dest_vec)
 
@@ -56,7 +61,7 @@ def scalar_projection_1d(vec, dest_vec) -> Union[List, float]:
     return dot
 
 
-def scalar_projection(vec, dest_vec) -> Union[np.ndarray, float]:
+def scalar_projection(vec: np.ndarray, dest_vec: np.ndarray) -> Union[np.ndarray, float]:
     norm = vecmag(dest_vec)
 
     if norm == 0:
@@ -66,9 +71,14 @@ def scalar_projection(vec, dest_vec) -> Union[np.ndarray, float]:
     return dot
 
 
-def squared_vecmag(vec) -> float:
+def squared_vecmag_1d(vec: List) -> float:
     x = math.sqrt(sum([x * x for x in vec]))
     # x = np.linalg.norm(vec)
+    return x * x
+
+
+def squared_vecmag(vec: np.ndarray) -> float:
+    x = np.linalg.norm(vec)
     return x * x
 
 
@@ -80,38 +90,41 @@ def norm_1d(vec: List) -> float:
     return norm
 
 
-def vecmag_1d(vec) -> float:
+def vecmag_1d(vec: List) -> float:
     """optimized efficiency for 1d lists"""
     # norm = np.linalg.norm(vec)
     norm = norm_1d(vec)
     return norm
 
 
-def vecmag(vec) -> float:
+def vecmag(vec: np.ndarray) -> float:
     norm = np.linalg.norm(vec)
     return norm
 
 
-def unitvec(vec):
+def unitvec_1d(vec: List) -> List:
+    # return np.divide(vec, vecmag(vec))
+    vecm = vecmag_1d(vec)
+    return [i/vecm for i in vec]
+
+
+def unitvec(vec) -> np.ndarray:
     return np.divide(vec, vecmag(vec))
 
 
-def cosine_similarity_1d(a, b):
+def cosine_similarity_1d(a, b) -> float:
     # return np.dot(a / np.linalg.norm(a), b / np.linalg.norm(b))
     a_norm = math.sqrt(sum([x * x for x in a]))
     b_norm = math.sqrt(sum([x * x for x in b]))
     return sum([i*j for i, j in zip([x/a_norm for x in a], [x/b_norm for x in b])])
 
 
-def cosine_similarity(a, b):
-    # return np.dot(a / np.linalg.norm(a), b / np.linalg.norm(b))
-    a_norm = math.sqrt(sum([x * x for x in a]))
-    b_norm = math.sqrt(sum([x * x for x in b]))
-    return sum([i*j for i, j in zip([x/a_norm for x in a], [x/b_norm for x in b])])
+def cosine_similarity(a, b) -> Union[np.ndarray, float]:
+    return np.dot(a / np.linalg.norm(a), b / np.linalg.norm(b))
 
 
 # @numba.njit(cache=True)
-def quat_to_euler(quat):
+def quat_to_euler(quat) -> List:
     w, x, y, z = quat
     sinr_cosp = 2 * (w * x + y * z)
     cosr_cosp = 1 - 2 * (x * x + y * y)
@@ -236,7 +249,7 @@ def rotation_to_quaternion(m: np.ndarray) -> np.ndarray:
 
 
 @numba.njit(cache=True)
-def euler_to_rotation(pyr):
+def euler_to_rotation(pyr) -> np.ndarray:
     cp, cy, cr = np.cos(pyr)
     sp, sy, sr = np.sin(pyr)
 
@@ -260,10 +273,23 @@ def euler_to_rotation(pyr):
     return theta
 
 
-def rand_uvec3(rng: np.random.Generator = np.random):
-    vec = rng.random(3) - 0.5
+def rand_uvec3(rng: np.random.Generator = np.random) -> np.ndarray:
+    vec: np.ndarray = rng.random(3) - 0.5
     return vec / np.linalg.norm(vec)
 
 
-def rand_vec3(max_norm, rng: np.random.Generator = np.random):
+def rand_uvec3_1d() -> List:
+    # vec = rng.random(3) - 0.5
+    vec = [random.random() - 0.5 for i in range(3)]
+    # return vec / np.linalg.norm(vec)
+    norm_vec = norm_1d(vec)
+    return [i/norm_vec for i in vec]
+
+
+def rand_vec3_1d(max_norm: float) -> List:
+    partial = random.random() * max_norm
+    return [i*partial for i in rand_uvec3_1d()]
+
+
+def rand_vec3(max_norm, rng: np.random.Generator = np.random) -> np.ndarray:
     return rand_uvec3(rng) * (rng.random() * max_norm)

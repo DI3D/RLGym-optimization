@@ -1,4 +1,5 @@
 import numpy as np
+import math as math_py
 
 from rlgym.utils import RewardFunction, math
 from rlgym.utils.common_values import BALL_RADIUS, CAR_MAX_SPEED
@@ -12,8 +13,8 @@ class LiuDistancePlayerToBallReward(RewardFunction):
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         # Compensate for inside of ball being unreachable (keep max reward at 1)
         # dist = np.linalg.norm(player.car_data.position - state.ball.position) - BALL_RADIUS
-        dist = np.linalg.norm([i - j for i, j in zip(player.car_data.position, state.ball.position)]) - BALL_RADIUS
-        return np.exp(-0.5 * dist / CAR_MAX_SPEED)  # Inspired by https://arxiv.org/abs/2105.12196
+        dist = math.norm_1d([i - j for i, j in zip(player.car_data.position, state.ball.position)]) - BALL_RADIUS
+        return math_py.exp(-0.5 * dist / CAR_MAX_SPEED)  # Inspired by https://arxiv.org/abs/2105.12196
 
 
 class VelocityPlayerToBallReward(RewardFunction):
@@ -53,7 +54,7 @@ class FaceBallReward(RewardFunction):
 
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         # pos_diff = state.ball.position - player.car_data.position
-        pos_diff = [i-j for i, j in zip(state.ball.position, player.car_data.position)]
+        pos_diff = [i - j for i, j in zip(state.ball.position, player.car_data.position)]
         # norm_pos_diff = pos_diff / np.linalg.norm(pos_diff)
         partial = math.norm_1d(pos_diff)
         # partial = np.linalg.norm(pos_diff)

@@ -134,4 +134,3 @@ class GameState(object):
                            self.inverted_ball)
 
         return output
-

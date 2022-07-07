@@ -1,5 +1,5 @@
 import numpy as np
-import math as mathpy
+import math as math_py
 
 from rlgym.utils import math
 from rlgym.utils.common_values import BLUE_TEAM, BLUE_GOAL_BACK, ORANGE_GOAL_BACK, ORANGE_TEAM, CAR_MAX_SPEED
@@ -20,7 +20,7 @@ class EventReward(RewardFunction):
         :param boost_pickup: reward for picking up boost. big pad = +1.0 boost, small pad = +0.12 boost.
         """
         super().__init__()
-        self.weights = np.array([goal, team_goal, concede, touch, shot, save, demo, boost_pickup])
+        self.weights = [goal, team_goal, concede, touch, shot, save, demo, boost_pickup]
 
         # Need to keep track of last registered value to detect changes
         self.last_registered_values = {}
@@ -48,9 +48,10 @@ class EventReward(RewardFunction):
         # diff_values = new_values - old_values
         diff_values = [i - j for i, j in zip(new_values, old_values)]
         # diff_values[diff_values < 0] = 0  # We only care about increasing values
-        diff_values = [x if x > 0 else 0 for x in diff_values]
+        # diff_values = [x if x > 0 else 0 for x in diff_values]
 
-        reward = sum([i * j for i, j in zip(self.weights, diff_values)])
+        # reward = sum([i * j for i, j in zip(self.weights, diff_values)])
+        reward = sum([i*j if j > 0 else 0 for i, j in zip(self.weights, diff_values)])
         # reward = np.dot(self.weights, diff_values)
 
         self.last_registered_values[player.car_id] = new_values
@@ -77,7 +78,7 @@ class SaveBoostReward(RewardFunction):
 
     def get_reward(self, player: PlayerData, state: GameState, previous_action: np.ndarray) -> float:
         # 1 reward for each frame with 100 boost, sqrt because 0->20 makes bigger difference than 80->100
-        return mathpy.sqrt(player.boost_amount)
+        return math_py.sqrt(player.boost_amount)
 
 
 class ConstantReward(RewardFunction):

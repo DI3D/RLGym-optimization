@@ -1,5 +1,5 @@
 # The Rocket League Gym But Optimized!?!?
-***----NOTE: EARLY ACCESS, BUGGY----***
+***----NOTE: EARLY ACCESS, (PROBABLY) BUGGY----***
 ## Description
 This is a python API that can be used to treat the game [Rocket League](https://www.rocketleague.com) as though it were an [OpenAI Gym](https://gym.openai.com)-style environment for Reinforcement Learning projects. This API must be used with the accompanying Bakkesmod plugin.
 

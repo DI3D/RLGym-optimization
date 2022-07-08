@@ -7,6 +7,7 @@ import math
 import numpy as np
 import numba
 import random
+import rlgym.rlgym_rust as rlgym_rust
 
 
 def get_dist(x: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -85,9 +86,10 @@ def squared_vecmag(vec: np.ndarray) -> float:
 def norm_1d(vec: List) -> float:
     """optimized efficiency for 1d lists"""
     # assuming non-complex 1d list
-    norm = math.sqrt(sum([x*x for x in vec]))
+    # norm = math.sqrt(sum([x*x for x in vec]))
+    # norm = rlgym_rust.norm_func(vec)
     # norm = np.linalg.norm(vec)
-    return norm
+    return rlgym_rust.norm_func(vec)
 
 
 def vecmag_1d(vec: List) -> float:
@@ -177,35 +179,36 @@ def quat_to_rot_mtx(quat) -> np.ndarray:
 
 
 def quat_to_rot_mtx_1d(quat) -> np.ndarray:
-    w = -quat[0]
-    x = -quat[1]
-    y = -quat[2]
-    z = -quat[3]
-
-    theta = np.zeros((3, 3))
-
-    # norm = np.dot(quat, quat)
-    norm = sum([i*j for i, j in zip(quat, quat)])
-    if norm != 0:
-        s = 1.0 / norm
-        # s = [1.0/i for i in norm]
-
-        # front direction
-        theta[0, 0] = 1.0 - 2.0 * s * (y * y + z * z)
-        theta[1, 0] = 2.0 * s * (x * y + z * w)
-        theta[2, 0] = 2.0 * s * (x * z - y * w)
-
-        # left direction
-        theta[0, 1] = 2.0 * s * (x * y - z * w)
-        theta[1, 1] = 1.0 - 2.0 * s * (x * x + z * z)
-        theta[2, 1] = 2.0 * s * (y * z + x * w)
-
-        # up direction
-        theta[0, 2] = 2.0 * s * (x * z + y * w)
-        theta[1, 2] = 2.0 * s * (y * z - x * w)
-        theta[2, 2] = 1.0 - 2.0 * s * (x * x + y * y)
-
-    return theta
+    # theta = rlgym_rust.quat_to_rot_mtx(quat)
+    # w = -quat[0]
+    # x = -quat[1]
+    # y = -quat[2]
+    # z = -quat[3]
+    #
+    # theta = np.zeros((3, 3))
+    #
+    # # norm = np.dot(quat, quat)
+    # norm = sum([i*j for i, j in zip(quat, quat)])
+    # if norm != 0:
+    #     s = 1.0 / norm
+    #     # s = [1.0/i for i in norm]
+    #
+    #     # front direction
+    #     theta[0, 0] = 1.0 - 2.0 * s * (y * y + z * z)
+    #     theta[1, 0] = 2.0 * s * (x * y + z * w)
+    #     theta[2, 0] = 2.0 * s * (x * z - y * w)
+    #
+    #     # left direction
+    #     theta[0, 1] = 2.0 * s * (x * y - z * w)
+    #     theta[1, 1] = 1.0 - 2.0 * s * (x * x + z * z)
+    #     theta[2, 1] = 2.0 * s * (y * z + x * w)
+    #
+    #     # up direction
+    #     theta[0, 2] = 2.0 * s * (x * z + y * w)
+    #     theta[1, 2] = 2.0 * s * (y * z - x * w)
+    #     theta[2, 2] = 1.0 - 2.0 * s * (x * x + y * y)
+    #
+    return rlgym_rust.quat_to_rot_mtx(quat)
 
 
 @numba.njit(cache=True)
